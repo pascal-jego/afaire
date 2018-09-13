@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title  %}
+    Liste des tâches
+{% endblock  %}
+
+{% block body %}
+    <div>
+        <ul class="list-group">
+            {% for listing in listings %}
+            <li class="list-group-item d-flex justify-content-between align-item-center">
+                {{ listing.name }}
+            </li>
+            {% endfor %}
+            <li class="list-group-item d-flex justify-content-between align-item-center">
+                <form method="post" action="{{ path('listing_create') }}" >
+                    <div class="input-group">
+                        <input type="text" placeholder="Ajouter une liste" class="form-control input-block-level" name="name">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-primary" type="submit">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </li>
+        </ul>
+    </div>
+{% endblock  %}
