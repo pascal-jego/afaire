@@ -16,12 +16,21 @@ use Symfony\Component\Routing\Annotation\Route;
 class ListingController extends Controller
 {
     /**
-     * @Route("/", name="show")
+     * @Route("/{listingId}", name="show", requirements={"listingId"="\d+"})
      */
-    public function show(EntityManagerInterface $entityManager)
+    public function show(EntityManagerInterface $entityManager, $listingId = null)
     {
         $listings = $entityManager->getRepository(Listing::class)->findAll();
-        return $this->render("listing.html.twig", compact("listings"));
+
+        if (!empty($listingId)) {
+            $currentListing = $entityManager->getRepository(Listing::class)->find($listingId);
+        }
+
+        if (empty($currentListing )) {
+            $currentListing = current($listings);
+        }
+
+        return $this->render("listing.html.twig", compact("listings","currentListing") );
     }
 
     /**
@@ -38,18 +47,31 @@ class ListingController extends Controller
 
         $listing = new Listing();
         $listing->setName($name);
-
         try {
-
         $entityManager->persist($listing);
         $entityManager->flush();
-
         $this->addFlash("success", "La liste  « $name » a été créée avec succès");
         } catch (UniqueConstraintViolationException $e) {
             $this->addFlash("warning", "impossible de créer la liste « $name » ");
         }
+        return $this->redirectToRoute("listing_show");
+    }
+    /**
+     * @Route("/{listingId}/delete", name="delete", requirements={"listingId"="\d+"})
+     */
+    public function delete(EntityManagerInterface $entityManager, $listingId) {
+        $listing = $entityManager->getRepository(Listing::class)->find($listingId);
+        if (empty($listing)) {
+            $this->addFlash("warning", "Impossible de supprimer ma liste ");
+        } else {
+
+            $entityManager->remove($listing);
+            $entityManager->flush();
+
+            $name = $listing->getName();
+            $this->addFlash("success", "La liste  « $name » a été supprimé avec succès");
+        }
 
         return $this->redirectToRoute("listing_show");
     }
-
 }

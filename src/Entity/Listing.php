@@ -21,6 +21,12 @@ class Listing
      */
     private $name;
 
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Task", mappedBy="listing")
+     */
+    private $tasks;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -36,5 +42,13 @@ class Listing
         $this->name = $name;
 
         return $this;
+    }
+    
+    /**
+     * @return mixed
+     */
+    public function getTasks()
+    {
+        return $this->tasks;
     }
 }
